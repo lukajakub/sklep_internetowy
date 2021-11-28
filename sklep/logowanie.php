@@ -1,6 +1,62 @@
 <?php
 session_start();
-?>
+    $login = $_POST["login"];
+    $haslo = $_POST["haslo"];
+include "rejestracja_weryfikacja.php";
+$connection= new Connection();
+
+  if(
+
+  isset($_POST["login"]) 
+   && ($_POST["login"] != "") 
+   
+
+   &&isset($_POST["haslo"]) 
+   &&($_POST["haslo"] != "") 
+
+
+  
+
+)
+{
+
+
+if((new Rejestracja())->zaloguj($login,$haslo))
+{
+  
+  $_SESSION["zalogowany"] = true;
+            $_SESSION["uzytkownik"] = $login;
+            echo'Pomyślnie zalogowano';
+$zapytanie = "SELECT nazwa_uprawnienia FROM konta INNER JOIN uprawnienia ON konta.id_uprawnienia  = uprawnienia.id_uprawnienia WHERE konta.login = '$login'; ";
+$result= $connection->query($zapytanie,[]);
+  $row = $result->fetchALL(\PDO::FETCH_ASSOC);
+  
+  if(!empty($row))
+    {
+      $_SESSION["rola"] = $row[0]['nazwa_uprawnienia'];
+     
+      }
+if(!empty( $_SESSION["rola"]))
+  {
+    if( $_SESSION["rola"]=='administrator')
+      {
+        header('location: administrator.php');
+        }
+     if( $_SESSION["rola"]=='pracownik')
+      {
+        header('location: pracownik.php');
+        }
+     if( $_SESSION["rola"]=='klient')
+      {
+        header('location: klient.php');
+        }
+    }
+}else
+{
+  echo'nie udalo sie zalogowac';
+}
+}
+    ?>
 <!DOCTYPE html>
 <head>
 <title>Sklep wędkarski ,,Szczupak''</title>
@@ -234,7 +290,7 @@ span.psw {
 </head>
 <body>
   
-    <a href="index.html"><img src="logo.png" alt="logo" class="responsive" ></a>  
+    <a href="index.php"><img src="logo.png" alt="logo" class="responsive" ></a>  
     <a href="koszyk.php"><img src="koszyk.png" alt="logo" class="responsive" style="float: right; margin: 10px;" ></a>
     <a href="logowanie.php"><img src="klient.png" alt="logo" class="responsive" style="float: right; margin: 10px;" ></a>
     <br><br>
@@ -277,42 +333,7 @@ span.psw {
     <div style="padding-left:20px; text-align: center;">
     <h2>Logowanie</h2>
     </div>
-    <?php
-    $login = $_POST["login"];
-    $haslo = $_POST["haslo"];
-include "rejestracja_weryfikacja.php";
-echo '<pre>';
-print_r($_POST);
-echo '</pre>';
-  if(
-
-  isset($_POST["login"]) 
-   && ($_POST["login"] != "") 
-   
-
-   &&isset($_POST["haslo"]) 
-   &&($_POST["haslo"] != "") 
-
-
-  
-
-)
-{
-
-
-if((new Rejestracja())->zaloguj($login,$haslo))
-{
-  
-  $_SESSION["zalogowany"] = true;
-            $_SESSION["uzytkownik"] = $login;
-            echo'Pomyślnie zalogowano';
-
-}else
-{
-  echo'nie udalo sie zalogowac';
-}
-}
-    ?>
+    
 <form action="logowanie.php" method="post">
   <div class="imgcontainer">
     <img src="klient.png" alt="Avatar" class="avatar" style="height: 500px; width=300px;">
@@ -342,17 +363,17 @@ if((new Rejestracja())->zaloguj($login,$haslo))
                     <div class="col-sm-6 col-md-3 item">
                         <h3>Współpraca</h3>
                         <ul>
-                            <li><a href="pzw.html">PZW</a></li>
-                            <li><a href="miasto.html">Miasto Siedlce</a></li>
-                            <li><a href="daiwa.html">Daiwa</a></li>
+                            <li><a href="pzw.php">PZW</a></li>
+                            <li><a href="miasto.php">Miasto Siedlce</a></li>
+                            <li><a href="daiwa.php">Daiwa</a></li>
                         </ul>
                     </div>
                     <div class="col-sm-6 col-md-3 item">
                         <h3>Sklep</h3>
                         <ul>
-                            <li><a href="historia.html">Historia</a></li>
-                            <li><a href="spis.html">Spis sklepów</a></li>
-                            <li><a href="kontakt.html">Kontakt</a></li>
+                            <li><a href="historia.php">Historia</a></li>
+                            <li><a href="spis.php">Spis sklepów</a></li>
+                            <li><a href="kontakt.php">Kontakt</a></li>
                         </ul>
                     </div>
                     <div class="col-md-6 item text">

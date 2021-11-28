@@ -1,12 +1,14 @@
 <?php
 include "navbar.php";
-    ?>
+?>
     <div style="padding-left:20px; text-align: center;">
-    <h2>Rejestracja</h2>
+    <h2>Dane osobowe</h2>
     </div>
     
+   
     <?php
-include "rejestracja_weryfikacja.php";
+    include "connection.php";
+    include "rejestracja_weryfikacja.php";
 
 if(
 
@@ -36,74 +38,80 @@ if(
   )
 
 {
-print("  <p class = 'msg error'> Błędne dane</p>");
+
 
 }
 else
 {
-    $email=$_POST["email"];
+   
     $telefon=$_POST["telefon"];
     $nr_lokalu=$_POST["nr_lokalu"];
-    $login = $_POST["login"];
-        $haslo = $_POST["haslo"];
+    
+        $id_konta=$_POST["id_konta"];
         $imie = $_POST["imie"];
         $nazwisko = $_POST["nazwisko"];
         $ulica = $_POST["ulica"];
         $miasto = $_POST["miasto"];
         $kod = $_POST["kod"];
         $nr_domu = $_POST["nr_domu"];
-    (new Rejestracja())->zarejestruj($email,$login,$haslo,$imie,$nazwisko,$telefon,$kod,$miasto,$ulica,$nr_domu,$nr_lokalu);
+    (new Rejestracja())->aktualizacja($imie,$nazwisko,$telefon,$kod,$miasto,$ulica,$nr_domu,$nr_lokalu,$id_konta);
 }
+      $uzytkownik=$_SESSION['uzytkownik'];
+    $zapytanie="SELECT imie,nazwisko,nr_tel,kod_pocztowy,miasto,ulica,nr_domu,nr_lokalu,klienci.id_konta FROM konta INNER JOIN klienci ON konta.id_konta=klienci.id_konta WHERE `login`= :login ";
+    
+   $connection= new Connection();
+
+   $result = $connection->query($zapytanie,["login"=>$uzytkownik]);
+   $row = $result->fetchALL(\PDO::FETCH_ASSOC);
+   $id_konta=$row[0]['id_konta'];
+    $imie=$row[0]['imie'];
+    $nazwisko=$row[0]['nazwisko'];
+    $nr_tel=$row[0]['nr_tel'];
+    $kod_pocztowy=$row[0]['kod_pocztowy'];
+    $miasto=$row[0]['miasto'];
+    $ulica=$row[0]['ulica'];
+    $nr_domu=$row[0]['nr_domu'];
+    $nr_lokalu=$row[0]['nr_lokalu'];
+   print_r("
+<form action='dane.php' method='post'>
+<div class='container'>
+<input value='$id_konta' type='hidden' name='id_konta' id='id_konta' required>
+  <label for='imie'><b>Imie</b></label>
+  <input value='$imie' type='text' placeholder='Podaj imie' name='imie' id='imie' required>
+
+  <label for='nazwisko'><b>Nazwisko</b></label>
+  <input value='$nazwisko' type='text' placeholder='Podaj nazwisko' name='nazwisko' id='nazwisko' required>
+
+  <label for='telefon'><b>Nr telefonu</b></label>
+  <input value='$nr_tel' type='number' placeholder='Podaj telefon' name='telefon' id='telefon' required>  
+  
+  <label for='kod'><b>Kod pocztowy</b></label>
+  <input value='$kod_pocztowy' type='text' pattern='[0-9]{2}-[0-9]{3}' placeholder='Podaj kod pocztowy' name='kod' id='kod' required>
+
+  <label for='miasto'><b>Miasto</b></label>
+  <input value='$miasto' type='text' placeholder='Podaj miasto' name='miasto' id='miasto' required>
+
+  <label for='ulica'><b>Ulica</b></label>
+  <input value='$ulica' type='text' placeholder='Podaj ulice' name='ulica' id='ulica' required>
+
+  <label for='nr_domu'><b>Numer domu</b></label>
+  <input value='$nr_domu' type='text' maxlength='5' placeholder='Podaj numer domu' name='nr_domu' id='nr_domu' required>
+
+  <label for='nr_lokalu'><b>Numer lokalu</b></label>
+  <input value='$nr_lokalu' type='text' maxlength='5' placeholder='Podaj numer lokalu' name='nr_lokalu' id='nr_lokalu' >
+  <hr>
+  
+
+  <button type='submit' class='registerbtn'>Zapisz</button>
+</div>
+
+
+</form>
+    ");
     ?>
     
     
     
-    <form action="rejestracja.php" method="post">
-  <div class="container">
-   
-
-    <label for="email"><b>Email</b></label>
-    <input type="email" placeholder="Enter Email" name="email" id="email" required>
-
-    <label for="login"><b>Login</b></label>
-    <input type="text" placeholder="Enter Login" name="login" id="login" required>
-
-    <label for="psw"><b>Hasło</b></label>
-    <input type="password" placeholder="Enter Password" name="haslo" id="haslo" required>
-
-    <label for="imie"><b>Imie</b></label>
-    <input type="text" placeholder="Podaj imie" name="imie" id="imie" required>
-
-    <label for="nazwisko"><b>Nazwisko</b></label>
-    <input type="text" placeholder="Podaj nazwisko" name="nazwisko" id="nazwisko" required>
-
-    <label for="telefon"><b>Nr telefonu</b></label>
-    <input type="number" placeholder="Podaj telefon" name="telefon" id="telefon" required>  
-    
-    <label for="kod"><b>Kod pocztowy</b></label>
-    <input type="text" pattern="[0-9]{2}-[0-9]{3}" placeholder="Podaj kod pocztowy" name="kod" id="kod" required>
-
-    <label for="miasto"><b>Miasto</b></label>
-    <input type="text" placeholder="Podaj miasto" name="miasto" id="miasto" required>
-
-    <label for="ulica"><b>Ulica</b></label>
-    <input type="text" placeholder="Podaj ulice" name="ulica" id="ulica" required>
-
-    <label for="nr_domu"><b>Numer domu</b></label>
-    <input type="text" maxlength="5" placeholder="Podaj numer domu" name="nr_domu" id="nr_domu" required>
-
-    <label for="nr_lokalu"><b>Numer lokalu</b></label>
-    <input type="text" maxlength="5" placeholder="Podaj numer lokalu" name="nr_lokalu" id="nr_lokalu" >
-    <hr>
-    
-
-    <button type="submit" class="registerbtn">Zarejestruj</button>
-  </div>
-  
-  <div class="container signin">
-    <p>Masz już konto? <a href="logowanie.php">Zaloguj</a>.</p>
-  </div>
-</form>
 
 
 

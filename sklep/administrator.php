@@ -1,12 +1,13 @@
 <?php
 include "navbar.php";
-    ?>
-    <div style="padding-left:20px; text-align: center;">
-    <h2>Rejestracja</h2>
-    </div>
-    
-    <?php
 include "rejestracja_weryfikacja.php";
+if( $_SESSION["rola"]!='administrator')
+{
+    
+}
+    
+    
+
 
 if(
 
@@ -18,47 +19,33 @@ if(
     ||($_POST["nazwisko"] == "") 
     ||(is_numeric($_POST["nazwisko"]))
 
-    ||!isset($_POST["ulica"]) 
-    ||($_POST["ulica"] == "") 
-    ||(is_numeric($_POST["ulica"]))
-
-    ||!isset($_POST["miasto"]) 
-    ||($_POST["miasto"] == "") 
-    ||(is_numeric($_POST["miasto"]))
-
-    ||!isset($_POST["kod"]) 
-    ||($_POST["kod"] == "") 
-    ||(is_numeric($_POST["kod"]))
-
-    ||!isset($_POST["nr_domu"]) 
-    ||($_POST["nr_domu"] == "") 
+    
 
   )
 
 {
-print("  <p class = 'msg error'> Błędne dane</p>");
+
 
 }
 else
 {
     $email=$_POST["email"];
-    $telefon=$_POST["telefon"];
-    $nr_lokalu=$_POST["nr_lokalu"];
+    
     $login = $_POST["login"];
         $haslo = $_POST["haslo"];
         $imie = $_POST["imie"];
         $nazwisko = $_POST["nazwisko"];
-        $ulica = $_POST["ulica"];
-        $miasto = $_POST["miasto"];
-        $kod = $_POST["kod"];
-        $nr_domu = $_POST["nr_domu"];
-    (new Rejestracja())->zarejestruj($email,$login,$haslo,$imie,$nazwisko,$telefon,$kod,$miasto,$ulica,$nr_domu,$nr_lokalu);
+        (new Rejestracja())->dodaj_pracownika($email,$login,$haslo,$imie,$nazwisko);
+    {
+    //   echo'<script>alert("Dodano pracownika") </script>';
+    }
+    
 }
     ?>
     
     
     
-    <form action="rejestracja.php" method="post">
+    <form action="administrator.php" method="post">
   <div class="container">
    
 
@@ -77,35 +64,51 @@ else
     <label for="nazwisko"><b>Nazwisko</b></label>
     <input type="text" placeholder="Podaj nazwisko" name="nazwisko" id="nazwisko" required>
 
-    <label for="telefon"><b>Nr telefonu</b></label>
-    <input type="number" placeholder="Podaj telefon" name="telefon" id="telefon" required>  
-    
-    <label for="kod"><b>Kod pocztowy</b></label>
-    <input type="text" pattern="[0-9]{2}-[0-9]{3}" placeholder="Podaj kod pocztowy" name="kod" id="kod" required>
-
-    <label for="miasto"><b>Miasto</b></label>
-    <input type="text" placeholder="Podaj miasto" name="miasto" id="miasto" required>
-
-    <label for="ulica"><b>Ulica</b></label>
-    <input type="text" placeholder="Podaj ulice" name="ulica" id="ulica" required>
-
-    <label for="nr_domu"><b>Numer domu</b></label>
-    <input type="text" maxlength="5" placeholder="Podaj numer domu" name="nr_domu" id="nr_domu" required>
-
-    <label for="nr_lokalu"><b>Numer lokalu</b></label>
-    <input type="text" maxlength="5" placeholder="Podaj numer lokalu" name="nr_lokalu" id="nr_lokalu" >
     <hr>
     
 
-    <button type="submit" class="registerbtn">Zarejestruj</button>
+    <button type="submit" class="registerbtn">Dodaj pracownika</button>
   </div>
   
-  <div class="container signin">
-    <p>Masz już konto? <a href="logowanie.php">Zaloguj</a>.</p>
-  </div>
 </form>
 
+<div class="col">
+  <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Imie</th>
+                        <th>Nazwisko</th>
+                        <th>E-mail</th>
+                        
+                    </tr>
+                    </thead>
+<?php
 
+   
+      
+     
+      {
+        $connection= new Connection();
+        $stmt = $connection->query("SELECT * FROM pracownicy ",[]);
+        $result = $stmt->fetchALL(\PDO::FETCH_ASSOC);
+        foreach ($result as $row){
+          
+            echo '<tr>';         
+            echo '<td>'.$row['imie'].'</td>';
+            echo '<td>'.$row['nazwisko'].'</td>';
+            echo '<td>'.$row['email'].'</td>';
+            
+            echo "<td><form  action = 'usun.php' method = 'POST'><input type='hidden' name='id_konta' value='".$row['id_konta']."'><input type = 'submit' value='Usuń'></form></td>";
+            echo '</tr>';
+        }
+       
+       
+    
+    }       
+?>
+
+</table>
+</div>
 
       
       <div class="footer-dark">

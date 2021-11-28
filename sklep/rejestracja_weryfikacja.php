@@ -49,5 +49,26 @@ mail($to, $subject, $message);
            return true;
        }
     } 
+    public function aktualizacja($imie,$nazwisko,$telefon,$kod,$miasto,$ulica,$nr_domu,$nr_lokalu,$id_konta)
+    {
+        $zapytanie= "UPDATE klienci SET imie='$imie',nazwisko='$nazwisko',nr_tel='$telefon',kod_pocztowy='$kod',miasto='$miasto',ulica='$ulica',nr_domu='$nr_domu',nr_lokalu='$nr_lokalu' WHERE id_konta=$id_konta";
+        
+        $this->connection->query($zapytanie,[]);
+    }
+    public function dodaj_pracownika($email,$login,$haslo,$imie,$nazwisko){
+        
+        
+        $HasloHash =   password_hash("$haslo", PASSWORD_DEFAULT);
+        $zapytanie1 = "INSERT INTO konta(id_uprawnienia,`login`,haslo) VALUES (2,'$login','$HasloHash');";
+        $this->connection->query($zapytanie1,[]);
+        $id_konta=$this->connection->getpdo()->lastInsertId();
+        $zapytanie="INSERT INTO pracownicy(imie,nazwisko,id_konta,email) VALUES ('$imie','$nazwisko','$id_konta','$email');";
+        if($this->connection->query($zapytanie,[]))
+       {
+           return true;
+       }
+       return true;
+        
+    }
 }
 ?>

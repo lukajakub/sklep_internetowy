@@ -10,7 +10,7 @@ class Connection{
         $query=$this->connection->prepare($query);
         $result= $query->execute($params);
         
-        print_r($this->connection->errorInfo());
+        //print_r($this->connection->errorInfo());
         return $query;
         
         
