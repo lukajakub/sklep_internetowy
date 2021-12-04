@@ -2,6 +2,35 @@
 include 'navbar.php';
 include 'connection.php';
 $connection= new Connection();
+if(isset($_POST['id_zamowienia']))
+{
+    $id_zamowienia=$_POST['id_zamowienia'];
+    $zapytanie="UPDATE zamowienia SET realizacja='zatwierdzono' WHERE id_zamowienia=$id_zamowienia";
+
+    $connection->query($zapytanie,[]);
+    $zapytanie2="SELECT * FROM zamowienia_produkt WHERE id_zamowienia=$id_zamowienia";
+    $result=$connection->query($zapytanie2,[]);
+    $rows=$result->fetchALL(\PDO::FETCH_ASSOC);
+    foreach($rows as $row)
+    {
+        $ilosc_zamowionego=$row['ilosc'];
+        $id_produktu=$row['id_produktu'];
+        $zapytanie="UPDATE produkty SET ilosc=ilosc-$ilosc_zamowionego WHERE id_produktu=$id_produktu";
+        
+        $connection->query($zapytanie,[]);
+    }
+$zapytanie="SELECT id_klienta FROM zamowienia WHERE id_zamowienia=$id_zamowienia";
+$result=$connection->query($zapytanie,[]);
+$row=$result->fetchALL(\PDO::FETCH_ASSOC);
+$id_klienta=$row[0]['id_klienta'];
+$zapytanie5="SELECT e_mail FROM klienci WHERE id_klienta=$id_klienta";
+$result=$connection->query($zapytanie5,[]);
+$row=$result->fetchALL(\PDO::FETCH_ASSOC);
+$e_mail=$row[0]['e_mail'];
+$message="Zamówienie numer: ".$id_zamowienia." zostało przyjęte do realizacji ";
+    mail($e_mail, 'Potwierdzenie zamowienia', $message);
+    unset($_POST['id_zamowienia']);
+}
 if(isset($_POST['records-limit'])){
     $_SESSION['records-limit'] = $_POST['records-limit'];
 }
@@ -9,10 +38,10 @@ if(isset($_POST['records-limit'])){
 $limit = isset($_SESSION['records-limit']) ? $_SESSION['records-limit'] : 5;
 $page = (isset($_GET['page']) && is_numeric($_GET['page']) ) ? $_GET['page'] : 1;
 $paginationStart = ($page - 1) * $limit;
-$produkty = $connection->query("SELECT * FROM produkty INNER JOIN kategorie ON produkty.id_kategorii=kategorie.id_kategorii LIMIT $paginationStart, $limit",[])->fetchAll();
+$zamowienia = $connection->query("SELECT * FROM zamowienia  INNER JOIN klienci ON klienci.id_klienta=zamowienia.id_klienta LIMIT $paginationStart, $limit",[])->fetchAll();
 
 // Get total records
-$sql = $connection->query("SELECT count(id_produktu) AS id FROM produkty",[])->fetchAll();
+$sql = $connection->query("SELECT count(id_zamowienia) AS id FROM zamowienia",[])->fetchAll();
 $allRecrods = $sql[0]['id'];
 
 // Calculate total pages
@@ -23,9 +52,6 @@ $prev = $page - 1;
 $next = $page + 1;
 ?>
 
-<a href="dodawanie_produktu.php"><button class="btn btn-primary">Dodaj produkt</button></a>
-<a href="dodawanie_kategorii.php"><button class="btn btn-primary">Dodaj kategorię</button></a>
-<a href="lista_zamowien.php"><button class="btn btn-primary">Lista zamówień</button></a>
 
 <div class="container mt-5">
         <h2 class="text-center mb-5">Simple PHP Pagination Demo</h2>
@@ -33,7 +59,7 @@ $next = $page + 1;
 
         <!-- Select dropdown -->
         <div class="d-flex flex-row-reverse bd-highlight mb-3">
-            <form action="pracownik.php" method="post">
+            <form action="oferta.php" method="post">
                 <select name="records-limit" id="records-limit" class="custom-select">
                     <option disabled selected>Records Limit</option>
                     <?php foreach([5,7,10,12] as $limit) : ?>
@@ -52,34 +78,40 @@ $next = $page + 1;
             <thead>
                 <tr class="table-success">
 
-                    <th scope="col">Nazwa produktu</th>
-                    <th scope="col">Kategoria</th>
-                    <th scope="col">Cena</th>
-                    <th scope="col">Producent</th>
-                    <th scope="col">Opis</th>
-                    <th scope="col">Ilośc</th>
-                    <th scope="col">Edycja</th>
+                    <th scope="col">Numer zamówienia</th>
+                    <th scope="col">Data złożenia</th>
+                    <th scope="col">Klient</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Do zapłaty</th>
+                    <th scope="col">Zatwierdź</th>
+                    
 
                 </tr>
             </thead>
 
             <tbody>
-                <?php foreach($produkty as $produkt): ?>
+                <?php foreach($zamowienia as $zamowienie): ?>
                 <tr>
                     
-                    <td><?php echo $produkt['nazwa_produktu']; ?></td>
-                    <td><?php echo $produkt['nazwa_kategorii']; ?></td>
-                    <td><?php echo $produkt['cena']; ?></td>
-                    <td><?php echo $produkt['producent']; ?></td>
-                    <td><?php echo $produkt['opis']; ?></td>
-                    <td><?php echo $produkt['ilosc']; ?></td>
+                    
+                    <td ><a style="text-decoration:none; color:inherit" href="lista_zamowien.php?id_zamowienia=<?php echo $zamowienie['id_zamowienia'] ?>"><?php echo $zamowienie['id_zamowienia']; ?></a></td>
+                    <td><?php echo $zamowienie['data_zamowienia']; ?></td>
+                    <td><?php echo $zamowienie['imie'].' '.$zamowienie['nazwisko']; ?></td>
+                    <td><?php echo $zamowienie['realizacja']; ?></td>
+                    <td><?php echo $zamowienie['do_zaplaty']; ?></td>
+
                     <?php
-                    $id_produktu=$produkt['id_produktu'];
-                    print_r("<form action='edycja_produktu.php' method='post'>
-                        <input type='hidden' name='id_produktu' value=$id_produktu>
-                    <td> <input type='submit' name='submit' value='Edytuj'> </td>
-                </form>");
+                    if($zamowienie['realizacja']=="weryfikacja")
+                    {
+
+                    
+                    $id_zamowienia=$zamowienie['id_zamowienia'];
+                    print_r("<form action='lista_zamowien.php' method='post'>
+                        <input type='hidden' name='id_zamowienia' value=$id_zamowienia>
+                    <td> <input type='submit' name='submit' value='Zatwierdź'> </td>
+                </form>");}
                 ?>
+                   
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -95,7 +127,7 @@ $next = $page + 1;
 
                 <?php for($i = 1; $i <= $totoalPages; $i++ ): ?>
                 <li class="page-item <?php if($page == $i) {echo 'active'; } ?>">
-                    <a class="page-link" href="pracownik.php?page=<?= $i; ?>"> <?= $i; ?> </a>
+                    <a class="page-link" href="oferta.php?page=<?= $i; ?>"> <?= $i; ?> </a>
                 </li>
                 <?php endfor; ?>
 

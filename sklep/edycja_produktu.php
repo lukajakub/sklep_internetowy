@@ -1,6 +1,7 @@
 <?php
 include 'navbar.php';
 include 'connection.php';
+include 'towary.php';
 $connection= new Connection();
 if(isset($_POST['id_produktu']))
 {
@@ -12,14 +13,53 @@ $result = $connection->query($zapytanie,[]);
     $id_kategorii=$row[0]['id_kategorii'];
     $cena=$row[0]['cena'];
     $producent=$row[0]['producent'];
+    $opis=$row[0]['opis'];
     $ilosc=$row[0]['ilosc'];
 
+    if(
 
-echo $zapytanie;
+        !isset($_POST["nazwa_produktu"]) 
+         || ($_POST["nazwa_produktu"] == "") 
+         ||(is_numeric($_POST["nazwa_produktu"]))
+    
+         ||!isset($_POST["cena"]) 
+        ||($_POST["cena"] == "") 
+        
+    
+        ||!isset($_POST["producent"]) 
+        ||($_POST["producent"] == "") 
+        ||(is_numeric($_POST["producent"]))
+    
+        ||!isset($_POST["ilosc"]) 
+        ||($_POST["ilosc"] == "") 
+       
+    
+      )
+    
+    {
+    echo 'nie wchodze';
+    
+    }
+    else
+    {
+       echo $_POST['selKategoria'];
+        $nazwa_produktu=$_POST["nazwa_produktu"];
+        $selKategoria=$_POST["selKategoria"];
+        
+            $id_produktu=$_POST["id_produktu"];
+        
+            $cena = $_POST["cena"];
+            $producent = $_POST["producent"];
+            $opis = $_POST["opis"];
+            $ilosc = $_POST["ilosc"];
+        echo 'wchodze';    
+        (new Towary())->edycja_produktu($id_produktu,$selKategoria,$nazwa_produktu,$cena,$producent,$opis,$ilosc);
+
+    }
 }
 ?>
 <div class="row justify-content-center">
-    <div class=" col-md-2 item border">
+    <div class=" col-md-6 item border">
 <?php
     print_r("<form action='edycja_produktu.php' method='post'>
 <div class='container'>
@@ -47,10 +87,11 @@ print_r("
   <label for='producent'><b>Producent</b></label>
   <input value='$producent' type='text' name='producent' id='producent' required>
  
+  <label for='opis'><b>Opis</b></label>
+  <input value='$opis' type='text' name='opis' id='opis' required>
+  
   <label for='ilosc'><b>Ilośc</b></label>
   <input value='$ilosc' type='number' name='ilosc' id='ilosc' required>
-  
-  
 
   <button type='submit' class='registerbtn'>Edytuj</button>
 </div>
@@ -62,7 +103,67 @@ print_r("
 
 
     </div>
-    <div class=" col-md-2 item border">
- 
+    <div class=" col-md-4 item border">
+    <div id="content">
+  
+  <form method="POST" 
+        action="upload.php" 
+        enctype="multipart/form-data">
+      <input type="file" 
+         
+      name="uploadfile" 
+             value="" />
+             <?php
+
+             
+             echo "<input value='$id_produktu' type='hidden' name='id_produktu' id='id_produktu' required>"
+             ?>
+      <div>
+          <button type="submit"
+                  name="upload">
+            UPLOAD
+          </button>
+      </div>
+
+  </form>
+</div>
+<div id="mycontainer">
+<?php
+$zapytanie="SELECT * FROM produkty_zdjecia WHERE id_produktu=$id_produktu";
+$result=$connection->query($zapytanie,[]);
+$rows = $result->fetchALL(\PDO::FETCH_ASSOC);
+foreach($rows as $row)
+{
+    $lokalizacja=$row['lokalizacja'];
+    $id_produkty_zdjecia=$row['id_produkty_zdjecia'];
+    echo"<div style='max-height:250px; max-width:250px; overflow: hidden'>";
+    
+    echo "<img src='images/$lokalizacja' alt='zdjecie'>";
+    print_r("<form method='POST' 
+    action='edycja_produktu.php' >
+    
+   
+     
+  
+        
+       
+
+         
+          <input value='$id_produktu' type='hidden' name='id_produktu' id='id_produktu' required>
+         <input value='$id_produkty_zdjecia' type='hidden' name='id_produkty_zdjecia' id='id_produkty_zdjecia' required>
+  <div>
+      <button type='submit'
+              name='Usuń'>
+        Usuń
+      </button>
+  </div>
+
+</form>");
+    echo "</div>";
+    
+}
+?>
+</div>
+</div>
     </div>
 </div>

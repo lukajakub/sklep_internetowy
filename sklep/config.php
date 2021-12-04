@@ -1,8 +1,8 @@
 <?php
 class Config{
-    const DBHOST = "ct8.pl";
+    const DBHOST = "localhost";
     const DBNAME = "m24206_pracownicy";
-    const DBUSER = "m24206_zadanie";
-    const DBPASS = "Zadanie123";
+    const DBUSER = "root";
+    const DBPASS = "";
 } 
 ?>
