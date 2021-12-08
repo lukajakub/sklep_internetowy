@@ -1,71 +1,31 @@
 <?php
 include 'navbar.php';
 include 'connection.php';
-?>
-<html>
-<div class="row justify-content-center">
-    <div class=" col-md-2 item border">
-<?php
 $connection= new Connection();
-$query="SELECT * FROM produkty ORDER BY RAND() LIMIT 1";
-
-$result=$connection->query($query,[]);
-$row = $result->fetchALL(\PDO::FETCH_ASSOC);
-echo $row[0]["nazwa_produktu"];
-$id_produktu=$row[0]['id_produktu'];
-$query2="SELECT zdjecie_glowne FROM produkty  WHERE id_produktu=$id_produktu  ";
-$result2=$connection->query($query2,[]);
-$row2 = $result2->fetchALL(\PDO::FETCH_ASSOC);
-$id_produkty_zdjecia=$row2[0]['zdjecie_glowne'];
-echo"<div>";
-if($id_produkty_zdjecia!=0)
+if(isset($_POST['nazwa_kategorii']))
 {
-    $zapytanie2="SELECT * FROM produkty_zdjecia WHERE id_produkty_zdjecia=$id_produkty_zdjecia";
-    $result3=$connection->query($zapytanie2,[]);
-    $row3 = $result3->fetchALL(\PDO::FETCH_ASSOC);
+    $nazwa_kategorii=$_POST['nazwa_kategorii'];
+    $zapytanie="INSERT INTO kategorie (nazwa_kategorii) VALUES ('$nazwa_kategorii')";
     
-    $lokalizacja=$row3[0]['lokalizacja'];
-    echo "<img style='heigth: 250px;width: 250px;' src='images/$lokalizacja' alt='zdjecie'>";
+    $result= $connection->query($zapytanie,[]);
+    print_r("<div class='alert alert-success' role='alert'>
+  Dodano kategorię
+</div>");
 }
-
-echo "<a class='btn btn-primary' href='opis.php?id_produktu=$id_produktu'>Szczegóły</a>";
-echo "</div>";
 ?>
 
+<form action="dodawanie_kategorii.php" method="post">
+  <div class="container">
+    <label for="nazwa_kategorii"><b>Nazwa kategorii</b></label>
+    <input type="text" placeholder="nazwa kategorii" name="nazwa_kategorii" required>
 
-
-    </div>
-    <div class=" col-md-2 item border">
-    <?php
-$connection= new Connection();
-$query="SELECT * FROM produkty ORDER BY RAND() LIMIT 1";
-$result=$connection->query($query,[]);
-$row = $result->fetchALL(\PDO::FETCH_ASSOC);
-echo $row[0]["nazwa_produktu"];
-$id_produktu=$row[0]['id_produktu'];
-$query2="SELECT zdjecie_glowne FROM produkty  WHERE id_produktu=$id_produktu  ";
-$result2=$connection->query($query2,[]);
-$row2 = $result2->fetchALL(\PDO::FETCH_ASSOC);
-$id_produkty_zdjecia=$row2[0]['zdjecie_glowne'];
-echo"<div>";
-if($id_produkty_zdjecia!=0)
-{
-    $zapytanie2="SELECT * FROM produkty_zdjecia WHERE id_produkty_zdjecia=$id_produkty_zdjecia";
-    $result3=$connection->query($zapytanie2,[]);
-    $row3 = $result3->fetchALL(\PDO::FETCH_ASSOC);
     
-    $lokalizacja=$row3[0]['lokalizacja'];
-    echo "<img style='heigth: 250px;width: 250px;' src='images/$lokalizacja' alt='zdjecie'>";
-}
-
-echo "<a class='btn btn-primary' href='opis.php?id_produktu=$id_produktu'>Szczegóły</a>";
-echo "</div>";
-?>
-
-    </div>
-</div>
-      
-      <div class="footer-dark">
+        
+    <button type="submit">Dodaj</button>
+  </div>
+</form>
+ 
+<div class="footer-dark">
         <footer>
             <div class="container">
                 <div class="row">

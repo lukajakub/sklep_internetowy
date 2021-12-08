@@ -38,7 +38,7 @@ $connection= new Connection();
         $selKategoria=$_POST["selKategoria"];
         
             $id_produktu=$_POST["id_produktu"];
-        
+        $opis=$_POST["opis"];
             $cena = $_POST["cena"];
             $producent = $_POST["producent"];
             $ilosc = $_POST["ilosc"];
@@ -52,7 +52,7 @@ $connection= new Connection();
             
             if (move_uploaded_file($tempname, $folder))  {
                 $msg = "Image uploaded successfully";
-                (new Towary())->dodawanie_produktu($selKategoria,$nazwa_produktu,$cena,$producent,$ilosc,$filename);
+                (new Towary())->dodawanie_produktu($selKategoria,$nazwa_produktu,$cena,$producent,$opis,$ilosc,$filename);
             }else{
                 $msg = "Failed to upload image";
           }     }           

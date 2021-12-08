@@ -3,6 +3,19 @@ include 'navbar.php';
 include 'connection.php';
 include 'towary.php';
 $connection= new Connection();
+if(isset($_POST['usun']))
+{
+    $id_produkty_zdjecia=$_POST['id_produkty_zdjecia'];
+    $zapytanie="DELETE FROM produkty_zdjecia WHERE id_produkty_zdjecia=$id_produkty_zdjecia";
+    $result = $connection->query($zapytanie,[]);
+}
+if(isset($_POST['glowne']))
+{
+    $id_produkty_zdjecia=$_POST['id_produkty_zdjecia'];
+    $id_produktu=$_POST['id_produktu'];
+    $zapytanie="UPDATE produkty SET zdjecie_glowne=$id_produkty_zdjecia WHERE id_produktu=$id_produktu";
+    $result = $connection->query($zapytanie,[]);
+}
 if(isset($_POST['id_produktu']))
 {
     $id_produktu=$_POST['id_produktu'];
@@ -127,7 +140,7 @@ print_r("
 
   </form>
 </div>
-<div id="mycontainer">
+<div >
 <?php
 $zapytanie="SELECT * FROM produkty_zdjecia WHERE id_produktu=$id_produktu";
 $result=$connection->query($zapytanie,[]);
@@ -136,34 +149,39 @@ foreach($rows as $row)
 {
     $lokalizacja=$row['lokalizacja'];
     $id_produkty_zdjecia=$row['id_produkty_zdjecia'];
-    echo"<div style='max-height:250px; max-width:250px; overflow: hidden'>";
     
-    echo "<img src='images/$lokalizacja' alt='zdjecie'>";
-    print_r("<form method='POST' 
+    
+    print_r( "
+    
+    <form  method='POST' 
     action='edycja_produktu.php' >
-    
-   
+
+    <img style='max-height:250px; max-width:250px;' src='images/$lokalizacja' alt='zdjecie'>
+  
      
   
         
        
 
          
-          <input value='$id_produktu' type='hidden' name='id_produktu' id='id_produktu' required>
-         <input value='$id_produkty_zdjecia' type='hidden' name='id_produkty_zdjecia' id='id_produkty_zdjecia' required>
-  <div>
-      <button type='submit'
-              name='Usuń'>
-        Usuń
-      </button>
-  </div>
+    <input value='$id_produktu' type='hidden' name='id_produktu' id='id_produktu' required>
+    <input value='$id_produkty_zdjecia' type='hidden' name='id_produkty_zdjecia' id='id_produkty_zdjecia' required>
+  
+  <button class='btn btn-danger' type='submit'
+  name='usun'>
+Usuń
+</button>
+<button type='submit'
+  name='glowne'>
+Ustaw jako zdjęcie główne
+</button>
+ 
 
 </form>");
-    echo "</div>";
+
+   
     
 }
 ?>
 </div>
-</div>
-    </div>
 </div>
