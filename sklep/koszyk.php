@@ -32,12 +32,14 @@ if(isset($_POST['id_koszyk']))
   </tr>
 <?php
 $ilosc=0;
+$cena_razem=0;
 foreach($row2 as $row)
 {
     $ilosc++;
     $nazwa=$row['nazwa_produktu'];
     $kasa=$row['cena_zamowionego'];
     $ile=$row['ilosc_zamowionego'];
+    $cena_razem+=$kasa*$ile;
 $id_koszyk=$row['id_koszyk'];
     echo "<tr>";
 
@@ -94,7 +96,7 @@ if($ilosc>0)
     <?php
 if(isset($_POST['submit']))
 {
-    $zapytanie4="INSERT INTO zamowienia (id_klienta,data_zamowienia,realizacja,do_zaplaty) VALUES ($id_klienta,CURDATE(),'weryfikacja',0) ";
+    $zapytanie4="INSERT INTO zamowienia (id_klienta,data_zamowienia,realizacja,do_zaplaty) VALUES ($id_klienta,CURDATE(),'weryfikacja',$cena_razem) ";
     echo $zapytanie4;
     $connection->query($zapytanie4,[]);
     $id_zamowienia=$connection->getpdo()->lastInsertId();

@@ -38,7 +38,7 @@ $next = $page + 1;
 
 
 <div class="container mt-5">
-        <h2 class="text-center mb-5">Simple PHP Pagination Demo</h2>
+        <h2 class="text-center mb-5">Produkty</h2>
 
 
         <!-- Select dropdown -->

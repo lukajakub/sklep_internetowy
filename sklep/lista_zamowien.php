@@ -8,7 +8,9 @@ if(isset($_POST['id_zamowienia']))
     $zapytanie="UPDATE zamowienia SET realizacja='zatwierdzono' WHERE id_zamowienia=$id_zamowienia";
 
     $connection->query($zapytanie,[]);
+
     $zapytanie2="SELECT * FROM zamowienia_produkt WHERE id_zamowienia=$id_zamowienia";
+
     $result=$connection->query($zapytanie2,[]);
     $rows=$result->fetchALL(\PDO::FETCH_ASSOC);
     foreach($rows as $row)
@@ -38,7 +40,23 @@ if(isset($_POST['records-limit'])){
 $limit = isset($_SESSION['records-limit']) ? $_SESSION['records-limit'] : 5;
 $page = (isset($_GET['page']) && is_numeric($_GET['page']) ) ? $_GET['page'] : 1;
 $paginationStart = ($page - 1) * $limit;
-$zamowienia = $connection->query("SELECT * FROM zamowienia  INNER JOIN klienci ON klienci.id_klienta=zamowienia.id_klienta LIMIT $paginationStart, $limit",[])->fetchAll();
+if(isset($_SESSION['uzytkownik']))
+{
+    $id=$_SESSION['id_konta'];
+    $zapytanie="SELECT id_klienta FROM klienci WHERE id_konta=$id";
+    $result=$connection->query($zapytanie,[]);
+    $row=$result->fetchALL(\PDO::FETCH_ASSOC);
+    $id_klienta=$row[0]['id_klienta'];
+    $zamowienia = $connection->query("SELECT * FROM zamowienia  INNER JOIN klienci ON klienci.id_klienta=zamowienia.id_klienta WHERE zamowienia.id_klienta=$id_klienta LIMIT $paginationStart, $limit",[])->fetchAll();
+    
+}
+
+else
+{
+    $zamowienia = $connection->query("SELECT * FROM zamowienia  INNER JOIN klienci ON klienci.id_klienta=zamowienia.id_klienta  LIMIT $paginationStart, $limit",[])->fetchAll();  
+}
+
+
 
 // Get total records
 $sql = $connection->query("SELECT count(id_zamowienia) AS id FROM zamowienia",[])->fetchAll();
@@ -54,7 +72,7 @@ $next = $page + 1;
 
 
 <div class="container mt-5">
-        <h2 class="text-center mb-5">Simple PHP Pagination Demo</h2>
+        <h2 class="text-center mb-5">Lista zamówień </h2>
 
 
         <!-- Select dropdown -->
@@ -83,7 +101,13 @@ $next = $page + 1;
                     <th scope="col">Klient</th>
                     <th scope="col">Status</th>
                     <th scope="col">Do zapłaty</th>
-                    <th scope="col">Zatwierdź</th>
+                    <?php
+if(isset($_SESSION['pracownik']))
+{
+   print_r("<th scope='col'>Zatwierdź</th>") ;
+}
+                    ?>
+                   
                     
 
                 </tr>
@@ -94,13 +118,17 @@ $next = $page + 1;
                 <tr>
                     
                     
-                    <td ><a style="text-decoration:none; color:inherit" href="lista_zamowien.php?id_zamowienia=<?php echo $zamowienie['id_zamowienia'] ?>"><?php echo $zamowienie['id_zamowienia']; ?></a></td>
+                <td ><a style="text-decoration:none; color:inherit" href="szczegoly_zamowienia.php?id_zamowienia=<?php echo $zamowienie['id_zamowienia'] ?>"><?php echo $zamowienie['id_zamowienia']; ?></a></td>
                     <td><?php echo $zamowienie['data_zamowienia']; ?></td>
                     <td><?php echo $zamowienie['imie'].' '.$zamowienie['nazwisko']; ?></td>
                     <td><?php echo $zamowienie['realizacja']; ?></td>
                     <td><?php echo $zamowienie['do_zaplaty']; ?></td>
 
                     <?php
+                    if(isset($_SESSION['pracownik']))
+                    {
+
+                    
                     if($zamowienie['realizacja']=="weryfikacja")
                     {
 
@@ -109,7 +137,7 @@ $next = $page + 1;
                     print_r("<form action='lista_zamowien.php' method='post'>
                         <input type='hidden' name='id_zamowienia' value=$id_zamowienia>
                     <td> <input type='submit' name='submit' value='Zatwierdź'> </td>
-                </form>");}
+                </form>");}}
                 ?>
                    
                 </tr>

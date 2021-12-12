@@ -211,7 +211,7 @@ else
     </ul>
    
     <a href="dane.php"><button class="btn btn-primary">Dane</button></a>
-<a href="zamowienia.php"><button class="btn btn-primary">Historia zamówień</button></a>
+<a href="lista_zamowien.php"><button class="btn btn-primary">Historia zamówień</button></a>
 
       
       <div class="footer-dark" style="margin-bottom:0px; float=bottom;">

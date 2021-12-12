@@ -53,12 +53,7 @@ if(isset($_SESSION['rola'])){
 
     <ul style="margin-bottom: 0px;">
       <li><a href="oferta.php">Oferta</a></li>
-      <li><a href="wedki.php">Wędki</a></li>
-      <li><a href="kolowrotki.php">Kołowrotki</a></li>
-      <li><a href="zylki.php">Żyłki</a></li>
-      <li><a href="plecionki.php">Plecionki</a></li>
-      <li><a href="przypony.php">Przypony</a></li>
-      <li><a href="woblery.php">Woblery</a></li>
+
     </ul>
     <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
       <ol class="carousel-indicators">
